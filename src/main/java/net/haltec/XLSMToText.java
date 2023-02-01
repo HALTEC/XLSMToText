@@ -70,17 +70,20 @@ public class XLSMToText {
             for (OutCell cell : row_cells) {
                 if (cell.col > 0) {
                     if (cell.col == last_col + 1) {
-                        output.print(skipped_rows ? "╤═" : "┬─");
+                        output.print(skipped_rows ? "╤" : "┬");
                     } else {
-                        output.print(skipped_rows ? "╦═" : "╥─");
+                        output.print(skipped_rows ? "╦" : "╥");
                     }
                 }
+                output.print(skipped_rows ? "═" : "─");
                 output.print(" ");
                 String loc = rowColToExcel(rowNum, cell.col);
                 output.print(loc);
                 output.print(" ");
 
-                output.print((skipped_rows ? "═" : "─").repeat(cell.width - 2 - loc.length() + 1));
+                // plus one space at the start, plus one space at the end
+                // minus two spaces at the loc text start and end, minus the first line char before the loc text
+                output.print((skipped_rows ? "═" : "─").repeat(cell.width + 2 - 3 - loc.length()));
                 last_col = cell.col;
             }
             output.print("\n");
@@ -90,24 +93,31 @@ public class XLSMToText {
             do {
                 all_cells_done = true;
                 last_col = -1;
+                int counter = 0;
                 for (OutCell cell : row_cells) {
                     if (cell.col > 0) {
                         if (cell.col == last_col + 1) {
-                            output.print("│ ");
+                            output.print("│");
                         } else {
-                            output.print("║ ");
+                            output.print("║");
                         }
                     }
 
-                    if (text_row < cell.text_rows.length) {
+                    if (text_row < cell.text_rows.length && !cell.text_rows[text_row].isEmpty()) {
                         all_cells_done = false;
+                        output.print(" ");
                         output.print(cell.text_rows[text_row]);
-                        output.print(" ".repeat(cell.width - cell.text_rows[text_row].length() + 1));
+                        if (counter < row_cells.size() - 1) {
+                            output.print(" ".repeat(cell.width - cell.text_rows[text_row].length() + 1));
+                        }
                     }
                     else {
-                        output.print(" ".repeat(cell.width + 1));
+                        if (counter < row_cells.size() - 1) {
+                            output.print(" ".repeat(cell.width + 2));
+                        }
                     }
                     last_col = cell.col;
+                    counter++;
                 }
                 output.print("\n");
                 text_row++;
