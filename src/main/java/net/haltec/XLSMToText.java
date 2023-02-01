@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -264,11 +265,16 @@ public class XLSMToText {
 
     private void extractMacros(File input) {
         output.println("Macros {");
+        Pattern vb_base_pattern = Pattern.compile("^Attribute VB_Base = \"0\\{[^}]+\\}\\{[^}]+\\}\"$", Pattern.MULTILINE);
+        Pattern vb_function_pattern = Pattern.compile("((?:Private|Public|) (?:Function|Sub) )([^(]+\\([^)]*\\).*)$", Pattern.MULTILINE);
         try (VBAMacroReader reader = new VBAMacroReader(input)) {
             final Map<String, String> macros = reader.readMacros();
             for (Map.Entry<String, String> entry : macros.entrySet()) {
                 String moduleName = entry.getKey();
                 String moduleCode = entry.getValue();
+                moduleCode = moduleCode.replace("\r\n", "\n");
+                moduleCode = vb_base_pattern.matcher(moduleCode).replaceAll("Attribute VB_Base = \"0{XXX}{XXX}\"");
+                moduleCode = vb_function_pattern.matcher(moduleCode).replaceAll("$1" + moduleName + "::$2");
                 output.println("module " + moduleName + " {");
                 output.println(moduleCode);
                 output.println("}");
