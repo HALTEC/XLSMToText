@@ -206,7 +206,14 @@ public class XLSMToText {
             System.err.println("  XLSX2CSV <xlsx file> [min columns]");
             return;
         }
-        PrintStream csvOutStream = new PrintStream(args[0] + ".csv", StandardCharsets.UTF_8);
+
+        PrintStream csvOutStream;
+        if (args.length > 1) {
+            csvOutStream = new PrintStream(args[0] + ".csv", StandardCharsets.UTF_8);
+        }
+        else {
+            csvOutStream = System.out;
+        }
 
         File xlsxFile = new File(args[0]);
         if (!xlsxFile.exists()) {
