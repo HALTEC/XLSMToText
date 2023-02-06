@@ -1,3 +1,20 @@
+/* ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one or more
+   contributor license agreements.  See the NOTICE file distributed with
+   this work for additional information regarding copyright ownership.
+   The ASF licenses this file to You under the Apache License, Version 2.0
+   (the "License"); you may not use this file except in compliance with
+   the License.  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+==================================================================== */
+
 package net.haltec;
 
 import java.io.File;
@@ -87,7 +104,7 @@ public class XLSMToText {
                 output.print((skipped_rows ? "═" : "─").repeat(cell.width + 2 - 3 - loc.length()));
                 last_col = cell.col;
             }
-            output.print("\n");
+            output.println();
 
             boolean all_cells_done;
             int text_row = 0;
@@ -120,7 +137,7 @@ public class XLSMToText {
                     last_col = cell.col;
                     counter++;
                 }
-                output.print("\n");
+                output.println();
                 text_row++;
             } while (!all_cells_done);
         }
@@ -137,30 +154,11 @@ public class XLSMToText {
 
     private final PrintStream output;
 
-    /**
-     * Creates a new XLSX -&gt; CSV converter
-     *
-     * @param pkg        The XLSX package to process
-     * @param output     The PrintStream to output the CSV to
-     */
     public XLSMToText(OPCPackage pkg, PrintStream output) {
         this.xlsxPackage = pkg;
         this.output = output;
     }
 
-    /**
-     * Parses and shows the content of one sheet
-     * using the specified styles and shared-strings tables.
-     *
-     * @param styles The table of styles that may be referenced by cells in the sheet
-     * @param strings The table of strings that may be referenced by cells in the sheet
-     * @param sheetInputStream The stream to read the sheet-data from.
-
-     * @throws java.io.IOException An IO exception from the parser,
-     *            possibly from a byte stream or character stream
-     *            supplied by the application.
-     * @throws SAXException if parsing the XML data fails.
-     */
     public void processSheet(Styles styles, SharedStrings strings, SheetContentsHandler sheetHandler, InputStream sheetInputStream) throws IOException, SAXException {
         DataFormatter formatter = new DataFormatter(true);
         InputSource sheetSource = new InputSource(sheetInputStream);
@@ -175,12 +173,6 @@ public class XLSMToText {
         }
     }
 
-    /**
-     * Initiates the processing of the XLS workbook file to CSV.
-     *
-     * @throws IOException If reading the data from the package fails.
-     * @throws SAXException if parsing the XML data fails.
-     */
     public void extractSheets() throws IOException, OpenXML4JException, SAXException {
         output.println("Sheets {");
         ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(this.xlsxPackage);
@@ -272,7 +264,7 @@ public class XLSMToText {
             for (Map.Entry<String, String> entry : macros.entrySet()) {
                 String moduleName = entry.getKey();
                 String moduleCode = entry.getValue();
-                moduleCode = moduleCode.replace("\r\n", "\n");
+                moduleCode = moduleCode.replace("\r\n", System.lineSeparator());
                 moduleCode = vb_base_pattern.matcher(moduleCode).replaceAll("Attribute VB_Base = \"0{XXX}{XXX}\"");
                 moduleCode = vb_function_pattern.matcher(moduleCode).replaceAll("$1" + moduleName + "::$2");
                 output.println("module " + moduleName + " {");
