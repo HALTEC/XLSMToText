@@ -11,6 +11,16 @@ as well.
 ![a git diff screenshot](git_diff.gif)
 
 
+How to use from the command line
+--------------------------------
+
+    java -Dstdout.encoding=UTF-8 -Dline.separator=$'\n' -jar C:/path/to/XLSMToText-1.0.jar file1.xlsm > file1.txt
+    java -Dstdout.encoding=UTF-8 -Dline.separator=$'\n' -jar C:/path/to/XLSMToText-1.0.jar file2.xlsm > file2.txt
+    diff -d -u -F '^\(sheet\|module\) .* {\|\(Private\|Public\|\) \(Function\|Sub\)' file1.txt file2.txt |diff-so-fancy |less -RS
+
+Optionally have a look at [diff-so-fancy](https://github.com/so-fancy/diff-so-fancy). To use it, replace
+`|less -RS` with `|diff-so-fancy |less -RS`.
+
 How to use in Git
 -----------------
 
