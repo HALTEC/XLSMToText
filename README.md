@@ -16,10 +16,12 @@ How to use in Git
 
 First add four keys to your Git config:
 
-    git config --global diff.xlsm.textconv "java -Dfile.encoding=UTF-8 -Dline.separator=$'\n' -jar C:/path/to/XLSMToText-1.0.jar"
+    git config --global diff.xlsm.textconv "java -Dstdout.encoding=UTF-8 -Dline.separator=$'\n' -jar C:/path/to/XLSMToText-1.0.jar"
     git config --global diff.xlsm.cachetextconv true
     git config --global diff.xlsm.binary true
     git config --global diff.xlsm.xfuncname "^((sheet|module) .* \\{|(Private|Public|) (Function|Sub) [^(]+\\([^)]*\\).*)$"
+
+For Java versions < 19 use `-Dfile.encoding=UTF-8` instead of `-Dstdout.encoding=UTF-8`.
 
 Then add the following line to your repos `.gitattributes`:
 
